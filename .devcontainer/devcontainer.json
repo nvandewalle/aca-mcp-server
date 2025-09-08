@@ -1,0 +1,54 @@
+{
+    "name": "ACA MCP Server",
+    "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/azure-cli:1": {},
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.11"
+        }
+    },
+    "postCreateCommand": [
+        "bash",
+        "-c",
+        "curl -fsSL https://aka.ms/install-azd.sh | bash"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.azure-account",
+                "ms-azuretools.vscode-azurecontainerapps",
+                "ms-azuretools.vscode-azureresourcegroups",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-vscode.vscode-typescript-next",
+                "bradlc.vscode-tailwindcss",
+                "esbenp.prettier-vscode",
+                "ms-vscode.vscode-json"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": true
+                }
+            }
+        }
+    },
+    "forwardPorts": [
+        3000,
+        8000,
+        8080
+    ],
+    "remoteUser": "node",
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ]
+}
