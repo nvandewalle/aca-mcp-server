@@ -1,0 +1,111 @@
+{
+  "folders": [
+    {
+      "name": "Azure Container Apps MCP Server",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true,
+      "**/*.log": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/package-lock.json": true
+    },
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "javascript.preferences.includePackageJsonAutoImports": "on",
+    "npm.packageManager": "npm",
+    "eslint.workingDirectories": ["."],
+    "azure.resourceGroups.groupBy": "resourceType",
+    "bicep.completion.completeFunctionCalls": true,
+    "bicep.experimental.deploymentPaneEnabled": true
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.azure-account",
+      "ms-azuretools.vscode-azureresourcegroups",
+      "ms-azuretools.vscode-azurecontainerapps",
+      "ms-azuretools.vscode-cosmosdb",
+      "ms-azuretools.vscode-bicep",
+      "ms-vscode.vscode-docker",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "GitHub.copilot"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "npm: start",
+        "type": "npm",
+        "script": "start",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "npm: dev",
+        "type": "npm",
+        "script": "dev",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "npm: test",
+        "type": "npm",
+        "script": "test",
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Azure: Deploy",
+        "type": "shell",
+        "command": "azd up",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Docker: Build",
+        "type": "shell",
+        "command": "docker build -t aca-mcp-server .",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
