@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: aca-mcp-server
+metadata:
+  template: aca-mcp-server@0.0.1-beta
+
+services:
+  api:
+    project: .
+    language: js
+    host: containerapp
+
+hooks:
+  preprovision:
+    shell: sh
+    run: echo "Preparing to provision Azure resources..."
+    continueOnError: false
+  
+  postprovision:
+    shell: sh
+    run: |
+      echo "Azure resources provisioned successfully!"
+      echo "Container App URL: $SERVICE_API_URI"
+    continueOnError: true
