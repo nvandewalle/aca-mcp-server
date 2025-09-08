@@ -17,13 +17,6 @@ param tags object = {}
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 
-// Resource group
-resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: '${abbrs.resourcesResourceGroups}${environmentName}'
-  location: location
-  tags: tags
-}
-
 // Container Apps Environment
 resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: '${abbrs.appManagedEnvironments}${resourceToken}'
@@ -32,7 +25,6 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01'
   properties: {
     zoneRedundant: false
   }
-  scope: rg
 }
 
 // Container Registry
@@ -44,9 +36,8 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' =
     name: 'Basic'
   }
   properties: {
-    adminUserEnabled: true
+    adminUserEnabled: false
   }
-  scope: rg
 }
 
 // Cosmos DB Account
@@ -70,7 +61,6 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
     enableAutomaticFailover: false
     enableMultipleWriteLocations: false
   }
-  scope: rg
 }
 
 // Cosmos DB Database
@@ -127,16 +117,9 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: containerRegistry.properties.loginServer
-          username: containerRegistry.listCredentials().username
-          passwordSecretRef: 'registry-password'
         }
       ]
-      secrets: [
-        {
-          name: 'registry-password'
-          value: containerRegistry.listCredentials().passwords[0].value
-        }
-      ]
+      secrets: []
     }
     template: {
       containers: [
@@ -169,7 +152,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
     }
   }
-  scope: rg
 }
 
 // Cosmos DB Role Assignment for Managed Identity
@@ -183,10 +165,21 @@ resource cosmosRoleAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssi
   }
 }
 
+// Container Registry Role Assignment for Managed Identity (AcrPull)
+resource acrRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(containerRegistry.id, containerApp.id, 'AcrPull')
+  scope: containerRegistry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+    principalId: containerApp.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
 // Outputs
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
-output AZURE_RESOURCE_GROUP string = rg.name
+output AZURE_RESOURCE_GROUP string = resourceGroup().name
 
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.properties.loginServer
 output AZURE_CONTAINER_REGISTRY_NAME string = containerRegistry.name
