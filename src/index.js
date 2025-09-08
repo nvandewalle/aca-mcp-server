@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import express from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
 
 import CosmosService from './cosmos.js';
 import { teamMemberTools } from './handlers/tools.js';
@@ -112,18 +113,39 @@ class TeamMemberMCPServer {
         });
       });
 
-      // MCP Server-Sent Events endpoint
-      app.use('/sse', (req, res, next) => {
-        const transport = new SSEServerTransport('/sse', res);
-        this.server.connect(transport);
-        next();
+      // Create Streamable HTTP transport
+      const transport = new StreamableHTTPServerTransport({
+        sessionIdGenerator: () => crypto.randomUUID()
+      });
+
+      // Connect server to transport
+      await this.server.connect(transport);
+
+      // MCP Streamable HTTP endpoint
+      app.post('/mcp', async (req, res) => {
+        try {
+          await transport.handleRequest(req, res);
+        } catch (error) {
+          console.error('MCP request error:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      });
+
+      // MCP SSE endpoint for streaming
+      app.get('/mcp', async (req, res) => {
+        try {
+          await transport.handleRequest(req, res);
+        } catch (error) {
+          console.error('MCP SSE error:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
       });
 
       const port = process.env.PORT || 3000;
       app.listen(port, () => {
         console.log(`Team Member MCP Server running on port ${port}`);
         console.log(`Health check available at: http://localhost:${port}/health`);
-        console.log(`MCP endpoint available at: http://localhost:${port}/sse`);
+        console.log(`MCP endpoint available at: http://localhost:${port}/mcp`);
       });
     } catch (error) {
       console.error('Failed to start server:', error);
