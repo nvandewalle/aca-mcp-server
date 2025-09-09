@@ -9,16 +9,15 @@ services:
     project: .
     language: js
     host: containerapp
+# hooks:
+#   preprovision:
+#     shell: sh
+#     run: echo "Preparing to provision Azure resources..."
+#     continueOnError: false
 
-hooks:
-  preprovision:
-    shell: sh
-    run: echo "Preparing to provision Azure resources..."
-    continueOnError: false
-  
-  postprovision:
-    shell: sh
-    run: |
-      echo "Azure resources provisioned successfully!"
-      echo "Container App URL: $SERVICE_API_URI"
-    continueOnError: true
+#   postprovision:
+#     shell: sh
+#     run: |
+#       echo "Azure resources provisioned successfully!"
+#       echo "Container App URL: $SERVICE_API_URI"
+#     continueOnError: true
