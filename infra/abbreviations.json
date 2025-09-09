@@ -1,0 +1,8 @@
+{
+  "appContainerApps": "ca-",
+  "appManagedEnvironments": "cae-",
+  "containerRegistryRegistries": "cr",
+  "documentDBDatabaseAccounts": "cosmos-",
+  "keyVaultVaults": "kv-",
+  "resourcesResourceGroups": "rg-"
+}
